@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrainTicket - 火车票购票系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066cc;
+            --primary-hover: #0052a3;
+            --success: #28a745;
+            --business: #ff6b35;
+            --first: #ffd700;
+            --second: #4CAF50;
+        }
+
+        body {
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-brand {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-nav .nav-item {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .header-nav .nav-item:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .header-nav .nav-item.active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px 0;
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Search Form */
+        .search-form {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+            color: white;
+            font-weight: bold;
+            padding: 12px 30px;
+        }
+
+        /* Train Card */
+        .train-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .train-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .train-card-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .train-card-body {
+            padding: 20px;
+        }
+
+        .train-time {
+            font-size: 20px;
+            font-weight: bold;
+            color: #212529;
+        }
+
+        .train-duration {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .train-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+
+        /* Train Details */
+        .train-details {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Station Selector */
+        .station-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .station-arrow {
+            font-size: 32px;
+            color: #0066cc;
+        }
+
+        /* Seat Map */
+        .seat-map-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .seat-info-panel {
+            margin-bottom: 20px;
+        }
+
+        .seat-legend {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .seat-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .seat {
+            width: 45px;
+            height: 35px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .seat.available {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .seat.available:hover {
+            background: #c8e6c9;
+        }
+
+        .seat.selected {
+            background: #0066cc;
+            color: white;
+        }
+
+        .seat.sold {
+            background: #f5f5f5;
+            color: #9e9e9e;
+            cursor: not-allowed;
+        }
+
+        .seat.business {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffe0b2;
+        }
+
+        .seat.first {
+            background: #fff9c4;
+            color: #f57f17;
+            border: 1px solid #fff59d;
+        }
+
+        .seat.second {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .train-tips {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .train-tips h5 {
+            margin: 0 0 10px 0;
+            color: #0d47a1;
+        }
+
+        .ticket-qr {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .ticket-code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0066cc;
+            letter-spacing: 4px;
+            margin-top: 10px;
+        }
+
+        /* Section */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 2000;
+        }
+
+        /* Passengers Selector */
+        .passenger-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .passenger-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .passenger-item:hover {
+            background: #e9ecef;
+        }
+
+        .passenger-item.selected {
+            background: #e3f2fd;
+            border: 1px solid #0066cc;
+        }
+
+        .passenger-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="header-brand">
+                    <i class="bi bi-train-fill"></i>
+                    TrainTicket
+                </div>
+                <div class="header-nav">
+                    <div class="nav-item active" onclick="switchSection('query')" data-section="query">
+                        <i class="bi bi-search"></i> 查询
+                    </div>
+                    <div class="nav-item" onclick="switchSection('orders')" data-section="orders">
+                        <i class="bi bi-receipt"></i> 订单
+                    </div>
+                    <div class="nav-item" onclick="switchSection('stations')" data-section="stations">
+                        <i class="bi bi-map"></i> 车站
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Query Section -->
+            <section id="query-section" class="section active">
+                <h4 class="mb-4"><i class="bi bi-search"></i> 列车查询</h4>
+                
+                <!-- Search Form -->
+                <div class="search-form">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">出发站</label>
+                            <select class="form-select" id="from-station">
+                                <option value="BJ">北京南</option>
+                                <option value="SH">上海虹桥</option>
+                                <option value="GZ">广州南</option>
+                                <option value="SZ">深圳北</option>
+                                <option value="CD">成都东</option>
+                                <option value="CQ">重庆北</option>
+                                <option value="HZ">杭州东</option>
+                                <option value="NJ">南京南</option>
+                                <option value="WH">武汉</option>
+                                <option value="CS">长沙南</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">到达站</label>
+                            <select class="form-select" id="to-station">
+                                <option value="SH">上海虹桥</option>
+                                <option value="BJ">北京南</option>
+                                <option value="GZ">广州南</option>
+                                <option value="SZ">深圳北</option>
+                                <option value="CD">成都东</option>
+                                <option value="CQ">重庆北</option>
+                                <option value="HZ">杭州东</option>
+                                <option value="NJ">南京南</option>
+                                <option value="WH">武汉</option>
+                                <option value="CS">长沙南</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">出发日期</label>
+                            <input type="date" class="form-control" id="travel-date">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">&nbsp;</label>
+                            <button class="form-control search-btn" onclick="searchTrains()">
+                                <i class="bi bi-search"></i> 查询
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">&nbsp;</label>
+                            <button class="form-control btn btn-outline-secondary" onclick="clearSearch()">
+                                <i class="bi bi-x-circle"></i> 重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <h5 class="mt-4 mb-3">查询结果：共 <span id="train-count" class="text-primary">0</span> 趟列车</h5>
+                <div id="train-list"></div>
+            </section>
+
+            <!-- Train Detail Section -->
+            <section id="train-detail-section" class="section">
+                <button class="btn btn-secondary mb-3" onclick="switchSection('query')">
+                    <i class="bi bi-arrow-left"></i> 返回查询
+                </button>
+                <div id="train-detail-content"></div>
+            </section>
+
+            <!-- Seat Selection Section -->
+            <section id="seat-section" class="section">
+                <button class="btn btn-secondary mb-3" onclick="goBackToDetail()">
+                    <i class="bi bi-arrow-left"></i> 返回
+                </button>
+                
+                <div class="train-details">
+                    <h4 id="seat-train-name"></h4>
+                    <p class="text-muted mb-3" id="seat-train-info"></p>
+                    
+                    <!-- Train Tips -->
+                    <div class="train-tips">
+                        <h5><i class="bi bi-info-circle"></i> 温馨提示</h5>
+                        <ul class="mb-0">
+                            <li>座位选择后将在 15 分钟内锁定</li>
+                            <li>请确保在锁定时间内完成支付</li>
+                            <li>每张订单最多可购买 4 张票</li>
+                            <li>不同席别价格不同，请按需选择</li>
+                        </ul>
+                    </div>
+
+                    <!-- Seat Legend -->
+                    <div class="seat-legend">
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: #e8f5e9"></div>
+                            <span>二等座 ¥<span id="seat-price-2nd">500</span></span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: #fff9c4"></div>
+                            <span>一等座 ¥<span id="seat-price-1st">800</span></span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: #fff3e0"></div>
+                            <span>商务座 ¥<span id="seat-price-bus">1500</span></span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: #f5f5f5"></div>
+                            <span>已售</span>
+                        </div>
+                    </div>
+
+                    <!-- Seat Map -->
+                    <div class="seat-map-container">
+                        <h5 class="mb-3"><i class="bi bi-train-front-fill"></i> 座位图 - <span id="selected-seat-count">0</span> 座已选</h5>
+                        <div class="seat-info-panel">
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <div class="seat second" style="background: #e8f5e9; cursor: default;">
+                                        <i class="bi bi-train-front-fill"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-9 text-muted">
+                                    <small>↑ 上海虹桥 | 北京南 ↓</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="seat-map"></div>
+                        
+                        <!-- Seat Summary -->
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <h6>座位类型选择：</h6>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm" onclick="filterSeats('second')">二等座</button>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="filterSeats('first')">一等座</button>
+                                <button class="btn btn-outline-warning btn-sm" onclick="filterSeats('business')">商务座</button>
+                                <button class="btn btn-outline-success btn-sm" onclick="filterSeats('all')">全部座位</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Passengers -->
+                    <h5 class="mb-3"><i class="bi bi-people-fill"></i> 乘客信息</h5>
+                    <div class="passenger-selector" id="passenger-list">
+                        <!-- Passengers will be rendered here -->
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm" onclick="openAddPassengerModal()">
+                        <i class="bi bi-person-plus"></i> 添加乘客
+                    </button>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-check-circle"></i> 订单确认</h5>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>车次：</strong> <span id="order-train"></span></p>
+                            <p class="mb-1"><strong>出发：</strong> <span id="order-from"></span></p>
+                            <p class="mb-1"><strong>到达：</strong> <span id="order-to"></span></p>
+                            <p class="mb-1"><strong>时间：</strong> <span id="order-time"></span></p>
+                            <p class="mb-1"><strong>座位：</strong> <span id="order-seats">0 个</span></p>
+                            <p class="mb-1"><strong>票价：</strong> <span id="order-price">¥0</span></p>
+                            <p class="mb-1"><strong>总金额：</strong> <span id="order-total" class="text-danger fw-bold">¥0</span></p>
+                        </div>
+                    </div>
+                    <button class="btn btn-success w-100 mt-3" onclick="openConfirmModal()">
+                        <i class="bi bi-credit-card"></i> 立即支付
+                    </button>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="orders-section" class="section">
+                <h4 class="mb-4"><i class="bi bi-receipt"></i> 我的订单</h4>
+                <div id="orders-list"></div>
+            </section>
+
+            <!-- Stations Section -->
+            <section id="stations-section" class="section">
+                <h4 class="mb-4"><i class="bi bi-map"></i> 车站列表</h4>
+                <div id="station-list"></div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Confirm Modal -->
+    <div class="modal fade" id="confirm-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-credit-card"></i> 支付确认</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirm-info"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-success" onclick="payOrder()">
+                        <i class="bi bi-check-circle"></i> 支付成功
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticket Modal -->
+    <div class="modal fade" id="ticket-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-ticket-perforated"></i> 电子票信息</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="ticket-info"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="switchSection('orders')">
+                        查看订单
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Passenger Modal -->
+    <div class="modal fade" id="passenger-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-person-plus"></i> 添加乘客</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">姓名 *</label>
+                        <input type="text" class="form-control" id="passenger-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">身份证号 *</label>
+                        <input type="text" class="form-control" id="passenger-id" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addPassenger()">
+                        <i class="bi bi-check-circle"></i> 添加
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
